@@ -70,7 +70,7 @@ class Factory
 		$method->setVariadic($from->isVariadic());
 		$method->setComment(Helpers::unformatDocComment($from->getDocComment()));
 		if (PHP_VERSION_ID >= 70000 && $from->hasReturnType()) {
-			$method->setReturnType((string) $from->getReturnType());
+			$method->setReturnType((string) $from->getReturnType()->getName());
 			$method->setReturnNullable($from->getReturnType()->allowsNull());
 		}
 		return $method;
@@ -105,7 +105,7 @@ class Factory
 		$param = new Parameter($from->getName());
 		$param->setReference($from->isPassedByReference());
 		if (PHP_VERSION_ID >= 70000) {
-			$param->setTypeHint($from->hasType() ? (string) $from->getType() : null);
+			$param->setTypeHint($from->hasType() ? (string) $from->getType()->getName() : null);
 			$param->setNullable($from->hasType() && $from->getType()->allowsNull());
 		} elseif ($from->isArray() || $from->isCallable()) {
 			$param->setTypeHint($from->isArray() ? 'array' : 'callable');
@@ -123,8 +123,8 @@ class Factory
 		if ($from->isDefaultValueAvailable()) {
 			$param->setOptional(true);
 			$param->setDefaultValue($from->isDefaultValueConstant()
-				? new PhpLiteral($from->getDefaultValueConstantName())
-				: $from->getDefaultValue());
+                ? new PhpLiteral($from->getDefaultValueConstantName())
+                : $from->getDefaultValue());
 			$param->setNullable($param->isNullable() && $param->getDefaultValue() !== null);
 		}
 		return $param;
